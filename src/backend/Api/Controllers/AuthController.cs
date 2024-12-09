@@ -24,11 +24,11 @@ public class AuthController:ControllerBase
             }
             catch (DuplicateEmailException)
             {
-                return Ok();
+                return StatusCode(500, new { error = "Email уже зарегестрирован" });
             }
             catch(OrganizationException)
             {
-                
+                return StatusCode(500, new { error = "Неверный код организации" });
             }
         }
         return Ok();
@@ -47,7 +47,7 @@ public class AuthController:ControllerBase
             }
             catch(AuthorizationExeception) 
             {
-               ModelState.AddModelError("Email","Email или Пароль неверные");
+                return StatusCode(500, new { error = "Неверный  Email или Пароль" });
             }        
         }
         return Ok();

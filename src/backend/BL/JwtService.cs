@@ -3,7 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 
-public class JwtService : IJwt
+public class Jwt : IJwt
 {
     public string GenerateToken(User user)
     {
