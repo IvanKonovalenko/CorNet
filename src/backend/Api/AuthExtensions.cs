@@ -13,7 +13,7 @@ public static class AuthExtensions
             ValidateAudience = false,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("wdsfgerwbvervre"))
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("B8KslJq3mDtH9FT9S6Ls6xT7PDErwyqmkKKmXzjOYmY="))
         });
         return services;
     }

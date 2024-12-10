@@ -50,6 +50,6 @@ public class AuthController:ControllerBase
                 return StatusCode(500, new { error = "Неверный  Email или Пароль" });
             }        
         }
-        return Ok();
+        return StatusCode(500, new { error = "Данные невалидны" });
     }
 }

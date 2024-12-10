@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 [Route("[controller]")]
 [ApiController]
 [Authorize]
-class MessageController : ControllerBase
+public class MessageController : ControllerBase
 {
     private readonly IMessagesService _messagesService;
     public MessageController(IMessagesService messagesService)
@@ -14,28 +14,31 @@ class MessageController : ControllerBase
     [HttpPost("SendMessage")]
     public async Task<IActionResult> SendMessage(MessageModel model)
     {
-        var userId = User.FindFirst("userId")?.Value;
-        var email = User.FindFirst("email")?.Value;
-        
-        try
+        if(ModelState.IsValid)
         {
-            await _messagesService.SendMessage(model, email);
-            return Ok();
-        }
-        catch (UserException)
-        {
-            return StatusCode(500, new { error = "Пользователя несуществует" });
-        }
+            var userId = User.FindFirst("userId")?.Value;
 
+        
+            try
+            {
+                await _messagesService.SendMessage(model, userId);
+                return Ok();
+            }
+            catch (UserException)
+            {
+                return StatusCode(500, new { error = "Пользователя несуществует" });
+            }
+            
+        }
+         return StatusCode(500, new { error = "Данные невалидны" });
     }
     [HttpGet("Messages")]
     public async Task<IActionResult> Messages()
     {
-        var userId = User.FindFirst("userId")?.Value;
-        var email = User.FindFirst("email")?.Value;
+       var userId = User.FindFirst("userId")?.Value;
 
-
-        return Ok();
+        var messages = await _messagesService.GetMessages(userId);  
+        return Ok(messages);
     }
     
 }
