@@ -31,17 +31,17 @@ public class AuthController:ControllerBase
                 return StatusCode(500, new { error = "Неверный код организации" });
             }
         }
-        return Ok();
+        return StatusCode(500, new { error = "Данные невалидны" });
 
     }
     [HttpPost("Login")]
-    public async Task<IActionResult> Login(AuthModel model)
+    public async Task<IActionResult> Login(LoginModel model)
     {
         if (ModelState.IsValid)
         {
             try
             {
-                var user=await _auth.Authenticate(model.Email!, model.Password!);
+                var user=await _auth.Authenticate(model.Email!,model.Password!);
                 
                 return Ok(_jwt.GenerateToken(user));
             }
