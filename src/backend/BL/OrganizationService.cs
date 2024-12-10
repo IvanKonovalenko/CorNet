@@ -29,7 +29,7 @@ public class OrganizationService : IOrganizationService
     public async Task<List<UserModel>> GetUsers(string email)
     {
         var code = await _context.Users.Where(u=>u.Email==email).Select(u => u.Organization.Code).FirstOrDefaultAsync();;
-       return await _context.Users.Where(u=>u.Organization.Code==code).Select(m => new UserModel
+       return await _context.Users.Where(u=>u.Organization.Code==code&&u.Email!=email).Select(m => new UserModel
         {
             Email = m.Email,
             Name = m.Name,

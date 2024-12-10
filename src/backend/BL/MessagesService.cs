@@ -30,12 +30,17 @@ public class MessagesService : IMessagesService
             throw new UserException();
         return user;
     }
-    public async Task<List<Message>> GetMessages(string email)
+    public async Task<List<MessageModel>> GetMessages(string email)
     {
         return await _context.Messages
         .Include(m => m.Sender) 
         .Include(m => m.Recipient) 
         .Where(m => m.Sender.Email == email || m.Recipient.Email == email)
+        .Select(m=>new MessageModel(){
+            SendedMessage = m.SendedMessage,
+            EmailRecipient = m.Recipient.Email,
+            DateTime = m.DateTime
+        })
         .ToListAsync();
     }
      
