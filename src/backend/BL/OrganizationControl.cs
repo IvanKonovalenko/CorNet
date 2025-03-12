@@ -38,22 +38,47 @@ namespace BL
             return organization;
         }
 
-        public async Task<OrganizationRequest> SendRequestOrganization(OrganizationRequestModel organizationRequestModel, string email)
+        public async Task<OrganizationRequest> SendRequestOrganization(string code, string email)
         {
             User? user = await _context.Users.Where(user => user.Email == email).FirstOrDefaultAsync();
             if (user is null) throw new AuthorizationExeception();
 
-            var organization = await _context.Organizations.Where(o => o.Code == organizationRequestModel.Code).FirstOrDefaultAsync();
+            var organization = await _context.Organizations.Where(o => o.Code == code).FirstOrDefaultAsync();
             if (organization is null) throw new OrganizationNotExsistsException();
 
             if (await _context.OrganizationRequests.
-                AnyAsync(or => or.Organization.Code == organizationRequestModel.Code
+                AnyAsync(or => or.Organization.Code == code
                 && or.User.Email == email)) throw new RequestExsistsException();
 
             OrganizationRequest organizationRequest = new OrganizationRequest();
             organizationRequest.User = user;
             organizationRequest.Organization = organization;
+
+            await _context.OrganizationRequests.AddAsync(organizationRequest);
+            await _context.SaveChangesAsync();
             return organizationRequest;
+
+        }
+
+        public async Task<List<OrganizationRequestModel>> ShowRequestsOrganization(string code, string email)
+        {
+            User? user = await _context.Users.Where(user => user.Email == email).FirstOrDefaultAsync();
+            if (user is null) throw new AuthorizationExeception();
+
+            var organization = await _context.Organizations.Where(o => o.Code == code).FirstOrDefaultAsync();
+            if (organization is null) throw new OrganizationNotExsistsException();
+
+            if (await _context.UserOrganization.
+                AnyAsync(uo => uo.Organization == organization
+                && uo.User == user && (uo.Role == Role.Owner || uo.Role == Role.Admin))) throw new RoleAccessException();
+
+            return await _context.OrganizationRequests.Where(uo => uo.Organization.Code == code).Select(uo=>new OrganizationRequestModel() { 
+                OrganizationRequestId = uo.OrganizationRequestId,
+                Email = uo.User.Email,
+                Name = uo.User.Name,
+                Surname = uo.User.Surname,
+                Code = uo.Organization.Code
+            }).ToListAsync();
 
         }
 

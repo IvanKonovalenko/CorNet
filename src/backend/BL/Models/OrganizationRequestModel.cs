@@ -2,6 +2,10 @@
 {
     public class OrganizationRequestModel
     {
-        public string Code { get; set; }
+        public int OrganizationRequestId { get; set; }
+        public string Email { get; set; } = null!;
+        public string Name { get; set; } = null!;
+        public string Surname { get; set; } = null!;
+        public string Code { get; set; } = null!;
     }
 }

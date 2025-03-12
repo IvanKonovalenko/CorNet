@@ -1,4 +1,5 @@
-﻿using BL.Exceptions;
+﻿using System.Runtime.CompilerServices;
+using BL.Exceptions;
 using BL.Interfaces;
 using BL.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -23,7 +24,7 @@ public class OrganizationConroller: ControllerBase
             try
             {
                 var email = User.FindFirst("email")?.Value;
-                await _organizationControl.CreateOrganization(model, email);
+                await _organizationControl.CreateOrganization(model, email!);
                 return Ok();
             }
             catch (DuplicateOrganizationException)
@@ -38,14 +39,14 @@ public class OrganizationConroller: ControllerBase
         return StatusCode(500, new { error = "Данные невалидны" });
     }
     [HttpPost("SendRequest")]
-    public async Task<IActionResult> SendRequestOrganization(OrganizationRequestModel model)
+    public async Task<IActionResult> SendRequestOrganization(string code)
     {
         if (ModelState.IsValid)
         {
             try
             {
                 var email = User.FindFirst("email")?.Value;
-                await _organizationControl.SendRequestOrganization(model, email);
+                await _organizationControl.SendRequestOrganization(code, email!);
                 return Ok();
             }
             catch (AuthorizationExeception)
@@ -59,6 +60,31 @@ public class OrganizationConroller: ControllerBase
             catch (RequestExsistsException)
             {
                 return StatusCode(500, new { error = "Запрос в эту организацию уже отправлен" });
+            }
+        }
+        return StatusCode(500, new { error = "Данные невалидны" });
+    }
+    [HttpGet("ShowRequests")]
+    public async Task<IActionResult> ShowRequestOrganization(string code)
+    {
+        if (ModelState.IsValid)
+        {
+            try
+            {
+                var email = User.FindFirst("email")?.Value;
+                return Ok(await _organizationControl.ShowRequestsOrganization(code, email!));
+            }
+            catch (AuthorizationExeception)
+            {
+                return StatusCode(500, new { error = "Ошибка авторизации" });
+            }
+            catch (OrganizationNotExsistsException)
+            {
+                return StatusCode(500, new { error = "Организации с таким кодом не сществует" });
+            }
+            catch (RoleAccessException)
+            {
+                return StatusCode(500, new { error = "Просмотреть запросы может только владелец или администратор" });
             }
         }
         return StatusCode(500, new { error = "Данные невалидны" });
