@@ -5,9 +5,13 @@ namespace BL.Interfaces
 {
     public interface IOrganizationControl
     {
-        Task<Organization> CreateOrganization(OrganizationModel organizationModel, string email);
-        Task<OrganizationRequest> SendRequestOrganization(string code, string email);
-        Task<List<OrganizationRequestModel>> ShowRequestsOrganization(string code, string email);
-
+        Task<Organization> Create(OrganizationModel organizationModel, string email);
+        Task<OrganizationRequest> SendRequest(string code, string email);
+        Task<List<OrganizationRequestModel>> ShowRequests(string code, string email);
+        Task AcceptRequest(int OrganizationRequestId, string code, string email);
+        Task RefuseRequest(int OrganizationRequestId, string code, string email);
+        Task<List<UserModel>> ShowUsers(string code, string email);
+        Task DeleteUser(string code, string email, string emailDeleteUser);
+        Task ChangeRoleUser(string code, string email, string emailRoleUser, Role role);
     }
 }

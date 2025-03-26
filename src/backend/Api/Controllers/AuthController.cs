@@ -46,7 +46,7 @@ public class AuthController : ControllerBase
 
                 return Ok(_jwt.GenerateToken(user));
             }
-            catch (AuthorizationExeception)
+            catch (AuthorizationException)
             {
                 return StatusCode(500, new { error = "Неверный  Email или Пароль" });
             }

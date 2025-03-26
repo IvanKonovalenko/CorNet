@@ -40,7 +40,7 @@ namespace BL
             {
                 return user;
             }
-            throw new AuthorizationExeception();
+            throw new AuthorizationException();
         }
         public async Task ValidateEmail(string email)
         {
