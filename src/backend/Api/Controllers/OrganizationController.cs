@@ -1,6 +1,6 @@
 ﻿using BL.Exceptions;
 using BL.Interfaces;
-using BL.Models;
+using BL.Models.Organization;
 using DAL.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

@@ -1,4 +1,4 @@
-﻿namespace BL.Models
+﻿namespace BL.Models.Organization
 {
     public class OrganizationRequestModel
     {

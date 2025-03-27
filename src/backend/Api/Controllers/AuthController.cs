@@ -1,6 +1,6 @@
 ﻿using BL.Exceptions;
 using BL.Interfaces;
-using BL.Models;
+using BL.Models.Auth;
 using Microsoft.AspNetCore.Mvc;
 
 [Route("[controller]")]

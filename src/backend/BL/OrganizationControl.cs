@@ -1,9 +1,8 @@
 ﻿using BL.Exceptions;
 using BL.Interfaces;
-using BL.Models;
+using BL.Models.Organization;
 using DAL;
 using DAL.Entities;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace BL
@@ -15,7 +14,7 @@ namespace BL
         {
             _context = context;
         }
-        public async Task<Organization> Create(OrganizationModel organizationModel, string email)
+        public async Task Create(OrganizationModel organizationModel, string email)
         {
             await ValidateOrganization(organizationModel.Code);
 
@@ -35,7 +34,6 @@ namespace BL
             await _context.Organizations.AddAsync(organization);
             await _context.UserOrganization.AddAsync(userOrganization);
             await _context.SaveChangesAsync();
-            return organization;
         }
         public async Task<OrganizationRequest> SendRequest(string code, string email)
         {

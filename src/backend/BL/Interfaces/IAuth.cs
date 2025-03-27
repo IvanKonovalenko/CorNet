@@ -1,4 +1,4 @@
-﻿using BL.Models;
+﻿using BL.Models.Auth;
 using DAL.Entities;
 
 namespace BL.Interfaces

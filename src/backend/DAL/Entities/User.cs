@@ -6,7 +6,6 @@
         public string Email { get; set; } = null!;
         public string Name { get; set; } = null!;
         public string Surname { get; set; } = null!;
-        public File? Photo { get; set; }
         public string Password { get; set; } = null!;
         public string Salt { get; set; } = null!;
         public ICollection<UserOrganization> Organizations { get; set; } = new List<UserOrganization>();

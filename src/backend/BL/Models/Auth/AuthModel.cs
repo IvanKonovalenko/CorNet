@@ -1,4 +1,4 @@
-﻿namespace BL.Models
+﻿namespace BL.Models.Auth
 {
     public class AuthModel
     {
