@@ -10,6 +10,7 @@ builder.Services.AddScoped<IJwt, Jwt>();
 builder.Services.AddScoped<IEncrypt, Encyrpt>();
 builder.Services.AddScoped<IOrganizationControl, OrganizationControl>();
 builder.Services.AddScoped<IPostControl, PostControl>();
+builder.Services.AddScoped<IUserControl, UserControl>();
 
 builder.Services.AddAuth();
 builder.Services.AddControllers();

@@ -35,7 +35,7 @@ namespace BL
             await _context.UserOrganization.AddAsync(userOrganization);
             await _context.SaveChangesAsync();
         }
-        public async Task<OrganizationRequest> SendRequest(string code, string email)
+        public async Task SendRequest(string code, string email)
         {
             User? user = await _context.Users.Where(user => user.Email == email).FirstOrDefaultAsync();
             if (user is null) throw new AuthorizationException();
@@ -53,7 +53,6 @@ namespace BL
 
             await _context.OrganizationRequests.AddAsync(organizationRequest);
             await _context.SaveChangesAsync();
-            return organizationRequest;
 
         }
         public async Task<List<OrganizationRequestModel>> ShowRequests(string code, string email)
