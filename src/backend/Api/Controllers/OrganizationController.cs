@@ -167,6 +167,10 @@ public class OrganizationController: ControllerBase
             {
                 return StatusCode(500, new { error = "Организации с таким кодом не сществует" });
             }
+            catch (UserNotExistInOrganizationException)
+            {
+                return StatusCode(500, new { error = "Пользователь не состоит в организации" });
+            }
         }
         return StatusCode(500, new { error = "Данные невалидны" });
     }

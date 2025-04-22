@@ -13,7 +13,7 @@ namespace Api.Controllers
         {
             this._userControl = userControl;
         }
-        [HttpPost("ShowProfile")]
+        [HttpGet("ShowProfile")]
         public async Task<IActionResult> ShowProfile(string email)
         {
             if (ModelState.IsValid)
@@ -29,7 +29,7 @@ namespace Api.Controllers
             }
             return StatusCode(500, new { error = "Данные невалидны" });
         }
-        [HttpPost("ShowOrganizations")]
+        [HttpGet("ShowOrganizations")]
         public async Task<IActionResult> ShowOrganizations(string email)
         {
             if (ModelState.IsValid)

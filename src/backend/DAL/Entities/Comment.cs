@@ -8,5 +8,6 @@
         public User User { get; set; } = null!;
         public Post Post { get; set; } = null!;
         public string Text { get; set; } = null!;
+        public DateTime dateTime { get; set; } 
     }
 }

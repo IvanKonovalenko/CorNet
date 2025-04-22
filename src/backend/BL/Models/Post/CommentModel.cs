@@ -1,12 +1,12 @@
 ﻿namespace BL.Models.Post
 {
-    public class PostModel
+    public class CommentModel
     {
-        public int PostId { get; set; }
-        public string Text { get; set; } = null!;
+        public int CommentId { get; set; }
         public string Email { get; set; } = null!;
         public string Code { get; set; } = null!;
+        public int PostId { get; set; }
+        public string Text { get; set; } = null!;
         public DateTime dateTime { get; set; }
-        public int Likes { get; set; }
     }
 }

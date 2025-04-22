@@ -117,6 +117,9 @@ namespace BL
             var organization = await _context.Organizations.Where(o => o.Code == code).FirstOrDefaultAsync();
             if (organization is null) throw new OrganizationNotExistsException();
 
+            if (!await _context.UserOrganization.
+               AnyAsync(uo => uo.Organization == organization
+               && uo.User == user)) throw new UserNotExistInOrganizationException();
 
             return await _context.UserOrganization.Where(uo => uo.Organization.Code == code).Select(uo => new UserModel() {
                 Email = uo.User.Email,
