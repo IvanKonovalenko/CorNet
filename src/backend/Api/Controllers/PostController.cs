@@ -25,7 +25,7 @@ namespace Api.Controllers
                 try
                 {
                     var email = User.FindFirst("email")?.Value;
-                    await _postControl.Create(model,code, email!);
+                    await _postControl.CreatePost(model,code, email!);
                     return Ok();
                 }
                 catch (OrganizationNotExistsException)
@@ -39,6 +39,36 @@ namespace Api.Controllers
                 catch (RoleAccessException)
                 {
                     return StatusCode(500, new { error = "Создать пост может только владелец или администратор" });
+                }
+            }
+            return StatusCode(500, new { error = "Данные невалидны" });
+        }
+        [HttpDelete("Delete")]
+        public async Task<IActionResult> Delete(string code, int postId)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var email = User.FindFirst("email")?.Value;
+                    await _postControl.DeletePost(code, email!, postId);
+                    return Ok();
+                }
+                catch (OrganizationNotExistsException)
+                {
+                    return StatusCode(500, new { error = "Организации с таким кодом не сществует" });
+                }
+                catch (AuthorizationException)
+                {
+                    return StatusCode(500, new { error = "Ошибка авторизации" });
+                }
+                catch (RoleAccessException)
+                {
+                    return StatusCode(500, new { error = "Удалить пост может только владелец или администратор" });
+                }
+                catch (PostNotExistException)
+                {
+                    return StatusCode(500, new { error = "Пост несуществует" });
                 }
             }
             return StatusCode(500, new { error = "Данные невалидны" });
@@ -64,6 +94,65 @@ namespace Api.Controllers
                 catch (UserNotExistInOrganizationException)
                 {
                     return StatusCode(500, new { error = "Пользователь не состоит в организации" });
+                }
+            }
+            return StatusCode(500, new { error = "Данные невалидны" });
+        }
+        [HttpGet("ShowComments")]
+        public async Task<IActionResult> ShowComments(string code, int postId)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var email = User.FindFirst("email")?.Value;
+                    return Ok(await _postControl.ShowComments(code, email!, postId));
+                }
+                catch (OrganizationNotExistsException)
+                {
+                    return StatusCode(500, new { error = "Организации с таким кодом не сществует" });
+                }
+                catch (AuthorizationException)
+                {
+                    return StatusCode(500, new { error = "Ошибка авторизации" });
+                }
+                catch (UserNotExistInOrganizationException)
+                {
+                    return StatusCode(500, new { error = "Пользователь не состоит в организации" });
+                }
+                catch (PostNotExistException)
+                {
+                    return StatusCode(500, new { error = "Пост несуществует" });
+                }
+            }
+            return StatusCode(500, new { error = "Данные невалидны" });
+        }
+        [HttpPost("CreateComment")]
+        public async Task<IActionResult> CreateComment(string code, int postId, string text)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var email = User.FindFirst("email")?.Value;
+                    await _postControl.CreateComment(code, email!, postId, text);
+                    return Ok();
+                }
+                catch (OrganizationNotExistsException)
+                {
+                    return StatusCode(500, new { error = "Организации с таким кодом не сществует" });
+                }
+                catch (AuthorizationException)
+                {
+                    return StatusCode(500, new { error = "Ошибка авторизации" });
+                }
+                catch (UserNotExistInOrganizationException)
+                {
+                    return StatusCode(500, new { error = "Пользователь не состоит в организации" });
+                }
+                catch (PostNotExistException)
+                {
+                    return StatusCode(500, new { error = "Пост несуществует" });
                 }
             }
             return StatusCode(500, new { error = "Данные невалидны" });

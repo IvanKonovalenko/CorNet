@@ -8,5 +8,6 @@
         public string Code { get; set; } = null!;
         public DateTime dateTime { get; set; }
         public int Likes { get; set; }
+        public bool IsLiked { get; set; }
     }
 }
