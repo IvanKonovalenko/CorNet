@@ -126,18 +126,71 @@ namespace BL
             await _context.SaveChangesAsync();
         }
 
-        public Task DeleteComment(string code, string email, int postId, string CommentId)
+        public async Task DeleteComment(string code, string email, int postId, int CommentId)
         {
-            throw new NotImplementedException();
+            User? user = await _context.Users.Where(user => user.Email == email).FirstOrDefaultAsync();
+            if (user is null) throw new AuthorizationException();
+
+            var organization = await _context.Organizations.Where(o => o.Code == code).FirstOrDefaultAsync();
+            if (organization is null) throw new OrganizationNotExistsException();
+
+            var post = await _context.Posts.Where(p => p.PostId == postId).FirstOrDefaultAsync();
+            if (post is null) throw new PostNotExistException();
+
+            var comment = await _context.Comments.Where(c => c.CommentId == CommentId).FirstOrDefaultAsync();
+            if (post is null) throw new CommentNotExistException();
+
+            await ValidateRole(user, organization);
+
+            _context.Comments.Remove(comment);
+            await _context.SaveChangesAsync();
+
         }
-        public Task Like(string code, string email, int postId)
+        public async Task Like(string code, string email, int postId)
         {
-            throw new NotImplementedException();
+            User? user = await _context.Users.Where(user => user.Email == email).FirstOrDefaultAsync();
+            if (user is null) throw new AuthorizationException();
+
+            var organization = await _context.Organizations.Where(o => o.Code == code).FirstOrDefaultAsync();
+            if (organization is null) throw new OrganizationNotExistsException();
+
+            var post = await _context.Posts.Include(p => p.Likes).Where(p => p.PostId == postId).FirstOrDefaultAsync();
+            if (post is null) throw new PostNotExistException();
+
+            if (!await _context.UserOrganization.
+                AnyAsync(uo => uo.Organization == organization
+                && uo.User == user)) throw new UserNotExistInOrganizationException();
+
+            if (!post.Likes.Any(u => u.UserId == user.UserId))
+            {
+                post.Likes.Add(user);
+                await _context.SaveChangesAsync();
+            }
+
+
         }
 
-        public Task DisLike(string code, string email, int postId)
+        public async Task DisLike(string code, string email, int postId)
         {
-            throw new NotImplementedException();
+            User? user = await _context.Users.Where(user => user.Email == email).FirstOrDefaultAsync();
+            if (user is null) throw new AuthorizationException();
+
+            var organization = await _context.Organizations.Where(o => o.Code == code).FirstOrDefaultAsync();
+            if (organization is null) throw new OrganizationNotExistsException();
+
+            var post = await _context.Posts.Include(p => p.Likes).Where(p => p.PostId == postId).FirstOrDefaultAsync();
+            if (post is null) throw new PostNotExistException();
+
+            if (!await _context.UserOrganization.
+                AnyAsync(uo => uo.Organization == organization
+                && uo.User == user)) throw new UserNotExistInOrganizationException();
+
+            if (post.Likes.Any(u => u.UserId == user.UserId))
+            {
+                post.Likes.Remove(user);
+                await _context.SaveChangesAsync();
+            }
+
         }
 
 
