@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 
 namespace BL
 {
-    public class Encyrpt : IEncrypt
+    public class Encrypt : IEncrypt
     {
         public string HashPassword(string password, string salt)
         {

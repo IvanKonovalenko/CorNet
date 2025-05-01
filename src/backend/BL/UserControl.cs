@@ -19,7 +19,7 @@ namespace BL
             User? user = await _context.Users.FirstOrDefaultAsync(user => user.Email == email);
             if (user is null) throw new UserNotExistException();
 
-            return await _context.UserOrganization.Where(uo => uo.UserId == user.UserId)
+            return await _context.UserOrganizations.Where(uo => uo.UserId == user.UserId)
                 .Select(uo => new OrganizationModel() { Name = uo.Organization.Name, Code = uo.Organization.Code })
                 .ToListAsync();
         }

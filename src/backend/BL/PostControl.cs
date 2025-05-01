@@ -14,7 +14,7 @@ namespace BL
         {
             _context = context;
         }
-        public async Task CreatePost(CreatePostModel model, string code, string email)
+        public async Task CreatePost(string text, string code, string email)
         {
             User? user = await _context.Users.Where(user => user.Email == email).FirstOrDefaultAsync();
             if (user is null) throw new AuthorizationException();
@@ -25,8 +25,7 @@ namespace BL
             await ValidateRole(user, organization);
 
             Post post = new Post();
-            post.Text = model.Text;
-            post.dateTime = model.dateTime;
+            post.Text = text;
             post.User = user;
             post.Organization = organization;
             post.dateTime = DateTime.Now;
@@ -43,10 +42,10 @@ namespace BL
             var organization = await _context.Organizations.Where(o => o.Code == code).FirstOrDefaultAsync();
             if (organization is null) throw new OrganizationNotExistsException();
 
+            await ValidateRole(user, organization);
+
             var post = await _context.Posts.Where(p => p.PostId == postId).FirstOrDefaultAsync();
             if (post is null) throw new PostNotExistException();
-
-            await ValidateRole(user, organization);
 
             _context.Posts.Remove(post);
             await _context.SaveChangesAsync();
@@ -59,7 +58,7 @@ namespace BL
             var organization = await _context.Organizations.Where(o => o.Code == code).FirstOrDefaultAsync();
             if (organization is null) throw new OrganizationNotExistsException();
 
-            if (!await _context.UserOrganization.
+            if (!await _context.UserOrganizations.
                 AnyAsync(uo => uo.Organization == organization
                 && uo.User == user)) throw new UserNotExistInOrganizationException();
 
@@ -82,7 +81,7 @@ namespace BL
             var organization = await _context.Organizations.Where(o => o.Code == code).FirstOrDefaultAsync();
             if (organization is null) throw new OrganizationNotExistsException();
 
-            if (!await _context.UserOrganization.
+            if (!await _context.UserOrganizations.
                 AnyAsync(uo => uo.Organization == organization
                 && uo.User == user)) throw new UserNotExistInOrganizationException();
 
@@ -110,7 +109,7 @@ namespace BL
             var organization = await _context.Organizations.Where(o => o.Code == code).FirstOrDefaultAsync();
             if (organization is null) throw new OrganizationNotExistsException();
 
-            if (!await _context.UserOrganization.
+            if (!await _context.UserOrganizations.
                 AnyAsync(uo => uo.Organization == organization
                 && uo.User == user)) throw new UserNotExistInOrganizationException();
 
@@ -123,6 +122,7 @@ namespace BL
             comment.User = user;
             comment.dateTime = DateTime.Now;
 
+            await _context.AddAsync(comment);
             await _context.SaveChangesAsync();
         }
 
@@ -134,13 +134,13 @@ namespace BL
             var organization = await _context.Organizations.Where(o => o.Code == code).FirstOrDefaultAsync();
             if (organization is null) throw new OrganizationNotExistsException();
 
+            await ValidateRole(user, organization);
+
             var post = await _context.Posts.Where(p => p.PostId == postId).FirstOrDefaultAsync();
             if (post is null) throw new PostNotExistException();
 
             var comment = await _context.Comments.Where(c => c.CommentId == CommentId).FirstOrDefaultAsync();
-            if (post is null) throw new CommentNotExistException();
-
-            await ValidateRole(user, organization);
+            if (comment is null) throw new CommentNotExistException();
 
             _context.Comments.Remove(comment);
             await _context.SaveChangesAsync();
@@ -157,7 +157,7 @@ namespace BL
             var post = await _context.Posts.Include(p => p.Likes).Where(p => p.PostId == postId).FirstOrDefaultAsync();
             if (post is null) throw new PostNotExistException();
 
-            if (!await _context.UserOrganization.
+            if (!await _context.UserOrganizations.
                 AnyAsync(uo => uo.Organization == organization
                 && uo.User == user)) throw new UserNotExistInOrganizationException();
 
@@ -181,7 +181,7 @@ namespace BL
             var post = await _context.Posts.Include(p => p.Likes).Where(p => p.PostId == postId).FirstOrDefaultAsync();
             if (post is null) throw new PostNotExistException();
 
-            if (!await _context.UserOrganization.
+            if (!await _context.UserOrganizations.
                 AnyAsync(uo => uo.Organization == organization
                 && uo.User == user)) throw new UserNotExistInOrganizationException();
 
@@ -196,7 +196,7 @@ namespace BL
 
         public async Task ValidateRole(User user, Organization organization)
         {
-            if (!await _context.UserOrganization.
+            if (!await _context.UserOrganizations.
                 AnyAsync(uo => uo.Organization == organization
                 && uo.User == user && (uo.Role == Role.Owner || uo.Role == Role.Admin))) throw new RoleAccessException();
         }

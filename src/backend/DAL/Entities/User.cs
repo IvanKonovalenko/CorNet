@@ -11,6 +11,7 @@
         public ICollection<UserOrganization> Organizations { get; set; } = new List<UserOrganization>();
         public ICollection<OrganizationRequest> OrganizationRequests { get; set; } = new List<OrganizationRequest>();
         public ICollection<Post> Likes { get; set; } = new List<Post>();
+        public ICollection<Post> Posts { get; set; } = new List<Post>();
         public ICollection<Comment> Comments { get; set; } = new List<Comment>();
 
     }

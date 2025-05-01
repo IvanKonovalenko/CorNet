@@ -231,6 +231,11 @@ public class OrganizationController: ControllerBase
             {
                 return StatusCode(500, new { error = "Изменить роль пользователя может только владелец" });
             }
+            catch (RoleOwnerException)
+            {
+                return StatusCode(500, new { error = "Нельзя изменить роль владельца" });
+            }
+            
         }
         return StatusCode(500, new { error = "Данные невалидны" });
     }

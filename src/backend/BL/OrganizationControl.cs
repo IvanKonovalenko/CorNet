@@ -18,13 +18,13 @@ namespace BL
         {
             await ValidateOrganization(organizationModel.Code);
 
-            Organization organization = new Organization();
-            organization.Code = organizationModel.Code;
-            organization.Name = organizationModel.Name;
-
             User? user = await _context.Users.Where(user => user.Email == email).FirstOrDefaultAsync();
 
             if (user is null) throw new AuthorizationException();
+
+            Organization organization = new Organization();
+            organization.Code = organizationModel.Code;
+            organization.Name = organizationModel.Name;
 
             UserOrganization userOrganization = new UserOrganization();
             userOrganization.Organization = organization;
@@ -32,7 +32,7 @@ namespace BL
             userOrganization.Role = Role.Owner;
 
             await _context.Organizations.AddAsync(organization);
-            await _context.UserOrganization.AddAsync(userOrganization);
+            await _context.UserOrganizations.AddAsync(userOrganization);
             await _context.SaveChangesAsync();
         }
         public async Task SendRequest(string code, string email)
@@ -42,6 +42,10 @@ namespace BL
 
             var organization = await _context.Organizations.Where(o => o.Code == code).FirstOrDefaultAsync();
             if (organization is null) throw new OrganizationNotExistsException();
+
+            if (await _context.UserOrganizations.
+                AnyAsync(uo => uo.Organization.Code == code
+                && uo.User.Email == email)) throw new UserAlreadyInOrganizationException();
 
             if (await _context.OrganizationRequests.
                 AnyAsync(or => or.Organization.Code == code
@@ -90,7 +94,7 @@ namespace BL
             UserOrganization userOrganization = new UserOrganization() { User = organizationRequest.User, Organization = organization, Role = Role.Member };
 
             _context.OrganizationRequests.Remove(organizationRequest);
-            await _context.UserOrganization.AddAsync(userOrganization);
+            await _context.UserOrganizations.AddAsync(userOrganization);
             await _context.SaveChangesAsync();
         }
         public async Task RefuseRequest(int OrganizationRequestId, string code, string email)
@@ -117,11 +121,11 @@ namespace BL
             var organization = await _context.Organizations.Where(o => o.Code == code).FirstOrDefaultAsync();
             if (organization is null) throw new OrganizationNotExistsException();
 
-            if (!await _context.UserOrganization.
+            if (!await _context.UserOrganizations.
                AnyAsync(uo => uo.Organization == organization
                && uo.User == user)) throw new UserNotExistInOrganizationException();
 
-            return await _context.UserOrganization.Where(uo => uo.Organization.Code == code).Select(uo => new UserModel() {
+            return await _context.UserOrganizations.Where(uo => uo.Organization.Code == code).Select(uo => new UserModel() {
                 Email = uo.User.Email,
                 Name = uo.User.Name,
                 Surname = uo.User.Surname
@@ -135,13 +139,14 @@ namespace BL
             var organization = await _context.Organizations.Where(o => o.Code == code).FirstOrDefaultAsync();
             if (organization is null) throw new OrganizationNotExistsException();
 
-            await ValidateRole(user, organization);
+            if(!await _context.UserOrganizations.
+                AnyAsync(uo => uo.Organization == organization
+                && uo.User == user && (uo.Role == Role.Owner))) throw new RoleAccessException();
 
-            UserOrganization? userOrganization = await _context.UserOrganization.Where(uo => uo.User.Email == emailDeleteUser && uo.Organization.Code == code).FirstOrDefaultAsync();
+            UserOrganization? userOrganization = await _context.UserOrganizations.Where(uo => uo.User.Email == emailDeleteUser && uo.Organization.Code == code).FirstOrDefaultAsync();
             if (userOrganization is null) throw new UserNotExistInOrganizationException();
-            if (userOrganization.Role != Role.Member) throw new RoleAccessException();
 
-            _context.UserOrganization.Remove(userOrganization);
+            _context.UserOrganizations.Remove(userOrganization);
             await _context.SaveChangesAsync();
 
         }
@@ -153,26 +158,26 @@ namespace BL
             var organization = await _context.Organizations.Where(o => o.Code == code).FirstOrDefaultAsync();
             if (organization is null) throw new OrganizationNotExistsException();
 
-            if (!await _context.UserOrganization.
+            if (!await _context.UserOrganizations.
                 AnyAsync(uo => uo.Organization == organization
                 && uo.User == user && (uo.Role == Role.Owner))) throw new RoleAccessException();
 
-            UserOrganization? userOrganization = await _context.UserOrganization.Where(uo => uo.User.Email == emailRoleUser && uo.Organization.Code == code).FirstOrDefaultAsync();
+            UserOrganization? userOrganization = await _context.UserOrganizations.Where(uo => uo.User.Email == emailRoleUser && uo.Organization.Code == code).FirstOrDefaultAsync();
             if (userOrganization is null) throw new UserNotExistInOrganizationException();
-            if (userOrganization.Role == Role.Owner) throw new RoleAccessException();
+            if (userOrganization.Role == Role.Owner) throw new RoleOwnerException();
 
             userOrganization.Role = role;
             await _context.SaveChangesAsync();
 
 
         }
-        public async Task ValidateRole(User user, Organization organization)
+        private async Task ValidateRole(User user, Organization organization)
         {
-            if (!await _context.UserOrganization.
+            if (!await _context.UserOrganizations.
                 AnyAsync(uo => uo.Organization == organization
                 && uo.User == user && (uo.Role == Role.Owner || uo.Role == Role.Admin))) throw new RoleAccessException();
         }
-        public async Task ValidateOrganization(string code)
+        private async Task ValidateOrganization(string code)
         {
             var organization = await _context.Organizations.Where(o => o.Code == code).FirstOrDefaultAsync();
             if (organization?.OrganizationId != null)

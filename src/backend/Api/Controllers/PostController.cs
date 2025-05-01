@@ -18,14 +18,14 @@ namespace Api.Controllers
         }
 
         [HttpPost("Create")]
-        public async Task<IActionResult> Create(CreatePostModel model, string code)
+        public async Task<IActionResult> Create(string text, string code)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
                     var email = User.FindFirst("email")?.Value;
-                    await _postControl.CreatePost(model,code, email!);
+                    await _postControl.CreatePost(text, code, email!);
                     return Ok();
                 }
                 catch (OrganizationNotExistsException)

@@ -7,7 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddScoped<IAuth, Auth>();
 builder.Services.AddScoped<IJwt, Jwt>();
-builder.Services.AddScoped<IEncrypt, Encyrpt>();
+builder.Services.AddScoped<IEncrypt, Encrypt>();
 builder.Services.AddScoped<IOrganizationControl, OrganizationControl>();
 builder.Services.AddScoped<IPostControl, PostControl>();
 builder.Services.AddScoped<IUserControl, UserControl>();

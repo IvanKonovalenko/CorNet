@@ -17,16 +17,17 @@ namespace BL
             _context = context;
             _encrypt = encrypt;
         }
-        public async Task<User> CreateUser(RegisterModel registerModel)
+        private async Task<User> CreateUser(RegisterModel registerModel)
         {
-            User user = new User();
-            user.Salt = Guid.NewGuid().ToString();
-            user.Password = _encrypt.HashPassword(registerModel.Password, user.Salt);
-            user.Email = registerModel.Email;
-            user.Name = registerModel.Name;
-            user.Surname = registerModel.Surname;
-
-
+            var salt = Guid.NewGuid().ToString();    
+            var user = new User()
+            {
+                Salt = salt,
+                Password = _encrypt.HashPassword(registerModel.Password, salt),
+                Email = registerModel.Email,
+                Name = registerModel.Name,
+                Surname = registerModel.Surname
+            };
 
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
@@ -34,18 +35,18 @@ namespace BL
         }
         public async Task<User> Authenticate(AuthModel authModel)
         {
-            User? user = await _context.Users.Where(user => user.Email == authModel.Email).FirstOrDefaultAsync();
+            User? user = await _context.Users.FirstOrDefaultAsync(user => user.Email == authModel.Email);
 
-            if (user?.Password == _encrypt.HashPassword(authModel.Password, user.Salt))
+            if (user != null && user.Password == _encrypt.HashPassword(authModel.Password, user.Salt))
             {
                 return user;
             }
             throw new AuthorizationException();
         }
-        public async Task ValidateEmail(string email)
+        private async Task ValidateEmail(string email)
         {
-            User? user = await _context.Users.Where(user => user.Email == email).FirstOrDefaultAsync();
-            if (user?.UserId != null)
+            User? user = await _context.Users.FirstOrDefaultAsync(user => user.Email == email);
+            if (user != null)
                 throw new DuplicateEmailException();
         }
 
