@@ -166,6 +166,8 @@ namespace Tests
             await Assert.ThrowsAsync<RoleAccessException>(() => _organizationControl.DeleteUser("Org1", "test1@example.com", "test2@example.com"));
 
             await Assert.ThrowsAsync<UserNotExistInOrganizationException>(() => _organizationControl.DeleteUser("Org1", "test@example.com", "test4@example.com"));
+
+            await Assert.ThrowsAsync<DeleteYourSelfException>(() => _organizationControl.DeleteUser("Org1", "test@example.com", "test@example.com"));
         }
         [Fact]
         public async Task ChangeRoleUser()

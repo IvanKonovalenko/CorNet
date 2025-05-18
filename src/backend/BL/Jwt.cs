@@ -20,7 +20,7 @@ namespace BL
         {
             var claims = new List<Claim>
             {
-                new Claim("email", user.Email),
+                new Claim("idemail", user.Email),
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Secret"]));

@@ -1,9 +1,7 @@
 ﻿using BL.Exceptions;
-using BL.Models.Organization;
 using BL.Models.Post;
 using DAL.Entities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
 
 namespace Tests
 {

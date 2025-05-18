@@ -23,7 +23,7 @@ public class OrganizationController: ControllerBase
         {
             try
             {
-                var email = User.FindFirst("email")?.Value;
+                var email = User.FindFirst("idemail")?.Value;
                 await _organizationControl.Create(model, email!);
                 return Ok();
             }
@@ -45,7 +45,7 @@ public class OrganizationController: ControllerBase
         {
             try
             {
-                var email = User.FindFirst("email")?.Value;
+                var email = User.FindFirst("idemail")?.Value;
                 await _organizationControl.SendRequest(code, email!);
                 return Ok();
             }
@@ -71,7 +71,7 @@ public class OrganizationController: ControllerBase
         {
             try
             {
-                var email = User.FindFirst("email")?.Value;
+                var email = User.FindFirst("idemail")?.Value;
                 return Ok(await _organizationControl.ShowRequests(code, email!));
             }
             catch (AuthorizationException)
@@ -96,7 +96,7 @@ public class OrganizationController: ControllerBase
         {
             try
             {
-                var email = User.FindFirst("email")?.Value;
+                var email = User.FindFirst("idemail")?.Value;
                 await _organizationControl.AcceptRequest(OrganizationRequestId, code, email!);
                 return Ok();
             }
@@ -126,7 +126,7 @@ public class OrganizationController: ControllerBase
         {
             try
             {
-                var email = User.FindFirst("email")?.Value;
+                var email = User.FindFirst("idemail")?.Value;
                 await _organizationControl.RefuseRequest(OrganizationRequestId, code, email!);
                 return Ok();
             }
@@ -156,7 +156,7 @@ public class OrganizationController: ControllerBase
         {
             try
             {
-                var email = User.FindFirst("email")?.Value;
+                var email = User.FindFirst("idemail")?.Value;
                 return Ok(await _organizationControl.ShowUsers(code, email!));
             }
             catch (AuthorizationException)
@@ -174,14 +174,14 @@ public class OrganizationController: ControllerBase
         }
         return StatusCode(500, new { error = "Данные невалидны" });
     }
-    [HttpGet("DeleteUser")]
+    [HttpDelete("DeleteUser")]
     public async Task<IActionResult> DeleteUser(string code, string emailDeleteUser)
     {
         if (ModelState.IsValid)
         {
             try
             {
-                var email = User.FindFirst("email")?.Value;
+                var email = User.FindFirst("idemail")?.Value;
                 await _organizationControl.DeleteUser(code, email!, emailDeleteUser!);
                 return Ok();
             }
@@ -201,17 +201,21 @@ public class OrganizationController: ControllerBase
             {
                 return StatusCode(500, new { error = "Удалить пользователя может только владелец или администратор" });
             }
+            catch (DeleteYourSelfException)
+            {
+                return StatusCode(500, new { error = "Нельзя удалить самого себя" });
+            }
         }
         return StatusCode(500, new { error = "Данные невалидны" });
     }
-    [HttpGet("ChangeRoleUser")]
+    [HttpPost("ChangeRoleUser")]
     public async Task<IActionResult> ChangeRoleUser(string code, string emailRoleUser, Role role)
     {
         if (ModelState.IsValid)
         {
             try
             {
-                var email = User.FindFirst("email")?.Value;
+                var email = User.FindFirst("idemail")?.Value;
                 await _organizationControl.ChangeRoleUser(code, email!, emailRoleUser!, role);
                 return Ok();
             }

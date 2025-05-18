@@ -24,7 +24,7 @@ namespace Api.Controllers
             {
                 try
                 {
-                    var email = User.FindFirst("email")?.Value;
+                    var email = User.FindFirst("idemail")?.Value;
                     await _postControl.CreatePost(text, code, email!);
                     return Ok();
                 }
@@ -50,7 +50,7 @@ namespace Api.Controllers
             {
                 try
                 {
-                    var email = User.FindFirst("email")?.Value;
+                    var email = User.FindFirst("idemail")?.Value;
                     await _postControl.DeletePost(code, email!, postId);
                     return Ok();
                 }
@@ -80,7 +80,7 @@ namespace Api.Controllers
             {
                 try
                 {
-                    var email = User.FindFirst("email")?.Value;
+                    var email = User.FindFirst("idemail")?.Value;
                     await _postControl.Like(code, email!, postId);
                     return Ok();
                 }
@@ -103,14 +103,14 @@ namespace Api.Controllers
             }
             return StatusCode(500, new { error = "Данные невалидны" });
         }
-        [HttpPost("DsiLike")]
+        [HttpPost("DisLike")]
         public async Task<IActionResult> DisLike(string code, int postId)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
-                    var email = User.FindFirst("email")?.Value;
+                    var email = User.FindFirst("idemail")?.Value;
                     await _postControl.DisLike(code, email!, postId);
                     return Ok();
                 }
@@ -140,7 +140,7 @@ namespace Api.Controllers
             {
                 try
                 {
-                    var email = User.FindFirst("email")?.Value;
+                    var email = User.FindFirst("idemail")?.Value;
                     return Ok(await _postControl.ShowPosts(code, email!));
                 }
                 catch (OrganizationNotExistsException)
@@ -165,7 +165,7 @@ namespace Api.Controllers
             {
                 try
                 {
-                    var email = User.FindFirst("email")?.Value;
+                    var email = User.FindFirst("idemail")?.Value;
                     return Ok(await _postControl.ShowComments(code, email!, postId));
                 }
                 catch (OrganizationNotExistsException)
@@ -194,7 +194,7 @@ namespace Api.Controllers
             {
                 try
                 {
-                    var email = User.FindFirst("email")?.Value;
+                    var email = User.FindFirst("idemail")?.Value;
                     await _postControl.CreateComment(code, email!, postId, text);
                     return Ok();
                 }
@@ -224,7 +224,7 @@ namespace Api.Controllers
             {
                 try
                 {
-                    var email = User.FindFirst("email")?.Value;
+                    var email = User.FindFirst("idemail")?.Value;
                     await _postControl.DeleteComment(code, email!, postId, CommentId);
                     return Ok();
                 }

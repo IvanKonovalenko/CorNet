@@ -133,18 +133,22 @@ namespace BL
         }
         public async Task DeleteUser(string code, string email, string emailDeleteUser)
         {
+            if(email==emailDeleteUser) throw new DeleteYourSelfException();
+
             User? user = await _context.Users.Where(user => user.Email == email).FirstOrDefaultAsync();
             if (user is null) throw new AuthorizationException();
 
             var organization = await _context.Organizations.Where(o => o.Code == code).FirstOrDefaultAsync();
             if (organization is null) throw new OrganizationNotExistsException();
 
-            if(!await _context.UserOrganizations.
+            if (!await _context.UserOrganizations.
                 AnyAsync(uo => uo.Organization == organization
                 && uo.User == user && (uo.Role == Role.Owner))) throw new RoleAccessException();
 
             UserOrganization? userOrganization = await _context.UserOrganizations.Where(uo => uo.User.Email == emailDeleteUser && uo.Organization.Code == code).FirstOrDefaultAsync();
             if (userOrganization is null) throw new UserNotExistInOrganizationException();
+
+            
 
             _context.UserOrganizations.Remove(userOrganization);
             await _context.SaveChangesAsync();

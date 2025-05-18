@@ -28,7 +28,7 @@ namespace BL
             post.Text = text;
             post.User = user;
             post.Organization = organization;
-            post.dateTime = DateTime.Now;
+            post.dateTime = DateTime.UtcNow;
 
             await _context.Posts.AddAsync(post);
             await _context.SaveChangesAsync();
@@ -120,7 +120,7 @@ namespace BL
             comment.Post = post;
             comment.Text = text;
             comment.User = user;
-            comment.dateTime = DateTime.Now;
+            comment.dateTime = DateTime.UtcNow;
 
             await _context.AddAsync(comment);
             await _context.SaveChangesAsync();
