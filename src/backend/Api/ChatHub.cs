@@ -15,7 +15,6 @@ namespace Api
         {
             _context = context;
         }
-
         public async Task SendMessage(string receiverEmail, string messageText)
         {
             var senderEmail = Context.User?.Identity?.Name; 
@@ -54,7 +53,6 @@ namespace Api
                 sentAt = message.SentAt
             });
         }
-
         public override async Task OnConnectedAsync()
         {
             var email = Context.User?.Identity?.Name;
@@ -64,7 +62,6 @@ namespace Api
             }
             await base.OnConnectedAsync();
         }
-
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
             var email = Context.User?.Identity?.Name;

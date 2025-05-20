@@ -1,8 +1,8 @@
 using BL.Interfaces;
-using BL;
 using DAL;
 using Microsoft.EntityFrameworkCore;
 using Api;
+using BL.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,7 +20,7 @@ builder.Services.AddControllers();
 var connectionString = builder.Configuration.GetSection("connectionString").Value;
 builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString));
 
-var port = builder.Configuration.GetSection("connectionString").Value;
+var port = builder.Configuration.GetSection("port").Value;
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
@@ -40,7 +40,11 @@ using (var scope = app.Services.CreateScope())
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     dbContext.Database.EnsureDeleted();
     dbContext.Database.EnsureCreated();
-    await TestData.CreateTestData(dbContext);
+    var testData = builder.Configuration.GetSection("createTestData").Value;
+    if (Convert.ToBoolean(testData))
+    {
+        await TestData.CreateTestData(dbContext);
+    }
 }
 
 app.UseCors("AllowFrontend");

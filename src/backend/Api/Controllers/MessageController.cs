@@ -18,22 +18,19 @@ public class MessageController : ControllerBase
     [HttpGet("GetMessages")]
     public async Task<IActionResult> GetMessages(string receiver)
     {
-        if (ModelState.IsValid)
+        if (!ModelState.IsValid) return StatusCode(500, new { error = "Данные невалидны" });
+        try
         {
-            try
-            {
-                var email = User.FindFirst("idemail")?.Value;
-                return Ok(await _messageControl.GetMessages(email!, receiver));
-            }
-            catch (AuthorizationException)
-            {
-                return StatusCode(500, new { error = "Ошибка авторизации" });
-            }
-            catch (ReceiverException)
-            {
-                return StatusCode(500, new { error = "Получателя не сущесетвует" });
-            }
+            var email = User.FindFirst("idemail")?.Value;
+            return Ok(await _messageControl.GetMessages(email!, receiver));
         }
-        return StatusCode(500, new { error = "Данные невалидны" });
+        catch (AuthorizationException)
+        {
+            return StatusCode(500, new { error = "Ошибка авторизации" });
+        }
+        catch (ReceiverException)
+        {
+            return StatusCode(500, new { error = "Получателя не сущесетвует" });
+        }
     }
 }

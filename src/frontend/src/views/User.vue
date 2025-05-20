@@ -13,14 +13,27 @@
     <div class="chat-placeholder">
       <h3>Чат с {{ user?.name || '...' }}</h3>
       <div class="chat-box">
-        <div class="messages">
-          <div v-for="(msg, i) in messages" :key="i" class="message" :class="{ 'own': msg.senderEmail === currentEmail }">
-            <span><strong>{{ msg.senderEmail === currentEmail ? 'Вы' : msg.senderEmail }}</strong>: {{ msg.text }}</span>
+        <div class="messages" ref="messagesContainer">
+          <div
+            v-for="(msg, i) in messages"
+            :key="i"
+            class="message"
+            :class="{ 'own': msg.senderEmail === currentEmail }"
+          >
+            <span>
+              <strong>{{ msg.senderEmail === currentEmail ? 'Вы' : msg.senderEmail || 'Неизвестный' }}</strong>:
+              {{ msg.text }}
+            </span>
             <span class="timestamp">{{ new Date(msg.sentAt).toLocaleTimeString() }}</span>
           </div>
+          <div ref="bottomAnchor" />
         </div>
         <div class="input-area">
-          <input v-model="newMessage" @keyup.enter="sendMessage" placeholder="Введите сообщение..." />
+          <input
+            v-model="newMessage"
+            @keyup.enter="sendMessage"
+            placeholder="Введите сообщение..."
+          />
           <button @click="sendMessage">Отправить</button>
         </div>
       </div>
@@ -29,7 +42,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { defineProps } from 'vue'
 import { showProfile, showMessages } from '../services/usercontrol'
@@ -57,6 +70,15 @@ const messages = ref([])
 const newMessage = ref('')
 const connectionState = ref('Disconnected')
 
+const messagesContainer = ref(null)
+const bottomAnchor = ref(null)
+
+function scrollToBottom() {
+  nextTick(() => {
+    bottomAnchor.value?.scrollIntoView({ behavior: 'smooth' })
+  })
+}
+
 let connection = null
 
 onMounted(async () => {
@@ -73,33 +95,37 @@ onMounted(async () => {
   }
 
   try {
-    const res = await showMessages(props.email, {headers: { Authorization: `Bearer ${token}` } })
+    const res = await showMessages(props.email, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
     messages.value = res.data
+    scrollToBottom()
   } catch (err) {
     console.error('Ошибка загрузки сообщений:', err)
   }
-  //signalr
+
   connection = new HubConnectionBuilder()
-    .withUrl('http://localhost:5207/chathub', {
+    .withUrl('/api/chathub', {
       accessTokenFactory: () => token
     })
     .withAutomaticReconnect()
     .build()
 
-
   connection.on('ReceiveMessage', msg => {
+   console.log(msg);
     messages.value.push(msg)
+    scrollToBottom()
   })
 
   try {
     await connection.start()
     connectionState.value = connection.state
-    console.log('SignalR connected')
   } catch (err) {
     connectionState.value = 'Failed'
     console.error('Ошибка подключения к SignalR:', err)
   }
 })
+
 onBeforeUnmount(() => {
   if (connection) {
     connection.stop()
@@ -114,15 +140,17 @@ async function sendMessage() {
     return
   }
 
+  const messageToSend = newMessage.value.trim()
+
   try {
-    await connection.invoke('SendMessage', props.email, newMessage.value)
+    await connection.invoke('SendMessage', props.email, messageToSend)
     newMessage.value = ''
+    scrollToBottom()
   } catch (err) {
     console.error('Ошибка при отправке:', err)
   }
 }
 </script>
-
 
 <style scoped>
 .user-container {

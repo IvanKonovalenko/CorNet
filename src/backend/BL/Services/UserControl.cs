@@ -5,19 +5,17 @@ using DAL;
 using DAL.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace BL
+namespace BL.Services
 {
-    public class UserControl : IUserControl
+    public class UserControl : BaseService, IUserControl
     {
-        private readonly AppDbContext _context;
-        public UserControl(AppDbContext context)
+        public UserControl(AppDbContext context) : base(context)
         {
-            _context = context;
+
         }
         public async Task<List<OrganizationModel>>  ShowOrganizations(string email)
         {
-            User? user = await _context.Users.FirstOrDefaultAsync(user => user.Email == email);
-            if (user is null) throw new UserNotExistException();
+            User? user = await CheckUserExist(email);
 
             return await _context.UserOrganizations.Where(uo => uo.UserId == user.UserId)
                 .Select(uo => new OrganizationModel() { Name = uo.Organization.Name, Code = uo.Organization.Code })
@@ -25,10 +23,10 @@ namespace BL
         }
         public async Task<UserModel> ShowProfile(string email)
         {
-            User? user = await _context.Users.FirstOrDefaultAsync(user => user.Email == email);
-            if (user is null) throw new UserNotExistException();
+            User? user = await CheckUserExist(email);
 
             return new UserModel() { Email = user.Email, Name = user.Name, Surname = user.Surname };
         }
+
     }
 }

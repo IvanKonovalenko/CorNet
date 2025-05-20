@@ -2,7 +2,7 @@
 using BL.Interfaces;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 
-namespace BL
+namespace BL.Services
 {
     public class Encrypt : IEncrypt
     {

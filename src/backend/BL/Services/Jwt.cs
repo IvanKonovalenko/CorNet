@@ -6,9 +6,9 @@ using DAL.Entities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
-namespace BL
+namespace BL.Services
 {
-    public class Jwt : IJwt
+    public class Jwt :  IJwt
     {
         private readonly IConfiguration _config;
 

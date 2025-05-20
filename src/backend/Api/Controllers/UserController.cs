@@ -11,39 +11,33 @@ namespace Api.Controllers
         private readonly IUserControl _userControl;
         public UserController(IUserControl userControl)
         {
-            this._userControl = userControl;
+            _userControl = userControl;
         }
         [HttpGet("ShowProfile")]
         public async Task<IActionResult> ShowProfile(string email)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid) return StatusCode(500, new { error = "Данные невалидны" });
+            try
             {
-                try
-                {      
-                    return Ok(await _userControl.ShowProfile(email));
-                }
-                catch (UserNotExistException)
-                {
-                    return StatusCode(500, new { error = "Пользователь с таким email не зарегистрирован" });
-                }              
+                return Ok(await _userControl.ShowProfile(email));
             }
-            return StatusCode(500, new { error = "Данные невалидны" });
+            catch (UserNotExistException)
+            {
+                return StatusCode(500, new { error = "Пользователь с таким email не зарегистрирован" });
+            }
         }
         [HttpGet("ShowOrganizations")]
         public async Task<IActionResult> ShowOrganizations(string email)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid) return StatusCode(500, new { error = "Данные невалидны" });
+            try
             {
-                try
-                {
-                    return Ok(await _userControl.ShowOrganizations(email));
-                }
-                catch (UserNotExistException)
-                {
-                    return StatusCode(500, new { error = "Пользователь с таким email не зарегистрирован" });
-                }
+                return Ok(await _userControl.ShowOrganizations(email));
             }
-            return StatusCode(500, new { error = "Данные невалидны" });
+            catch (UserNotExistException)
+            {
+                return StatusCode(500, new { error = "Пользователь с таким email не зарегистрирован" });
+            }
         }
     }
 }

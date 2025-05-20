@@ -1,6 +1,4 @@
-﻿using DAL.Entities;
-
-namespace BL.Models.Organization
+﻿namespace BL.Models.Organization
 {
     public class UserModel
     {

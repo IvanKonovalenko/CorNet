@@ -19,38 +19,33 @@ public class AuthController : ControllerBase
     [HttpPost("Register")]
     public async Task<IActionResult> Register(RegisterModel model)
     {
-        if (ModelState.IsValid)
+        if (!ModelState.IsValid) return StatusCode(500, new { error = "Данные невалидны" });
+        try
         {
-            try
-            {
-                await _auth.Register(model);
-                return Ok();
-            }
-            catch (DuplicateEmailException)
-            {
-                return StatusCode(500, new { error = "Email уже зарегестрирован" });
-            }
+            await _auth.Register(model);
+            return Ok();
         }
-        return StatusCode(500, new { error = "Данные невалидны" });
+        catch (DuplicateEmailException)
+        {
+           return StatusCode(500, new { error = "Email уже зарегестрирован" });
+        }
+        
 
     }
 
     [HttpPost("Login")]
     public async Task<IActionResult> Authenticate(AuthModel model)
     {
-        if (ModelState.IsValid)
+        if (!ModelState.IsValid) return StatusCode(500, new { error = "Данные невалидны" });
+        try
         {
-            try
-            {
-                var user = await _auth.Authenticate(model);
+            var user = await _auth.Authenticate(model);
 
-                return Ok(_jwt.GenerateToken(user));
-            }
-            catch (AuthorizationException)
-            {
-                return StatusCode(500, new { error = "Неверный  Email или Пароль" });
-            }
+            return Ok(_jwt.GenerateToken(user));
         }
-        return StatusCode(500, new { error = "Данные невалидны" });
+        catch (AuthorizationException)
+        {
+            return StatusCode(500, new { error = "Неверный  Email или Пароль" });
+        }
     }
 }

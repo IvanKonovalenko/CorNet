@@ -6,15 +6,13 @@ using DAL.Entities;
 using Microsoft.EntityFrameworkCore;
 
 
-namespace BL
+namespace BL.Services
 {
-    public class Auth : IAuth
+    public class Auth : BaseService, IAuth
     {
-        private readonly AppDbContext _context;
         private readonly IEncrypt _encrypt;
-        public Auth(AppDbContext context, IEncrypt encrypt)
+        public Auth(AppDbContext context, IEncrypt encrypt) : base(context) 
         {
-            _context = context;
             _encrypt = encrypt;
         }
         private async Task<User> CreateUser(RegisterModel registerModel)
@@ -43,13 +41,6 @@ namespace BL
             }
             throw new AuthorizationException();
         }
-        private async Task ValidateEmail(string email)
-        {
-            User? user = await _context.Users.FirstOrDefaultAsync(user => user.Email == email);
-            if (user != null)
-                throw new DuplicateEmailException();
-        }
-
         public async Task Register(RegisterModel registerModel)
         {
             await ValidateEmail(registerModel.Email);
