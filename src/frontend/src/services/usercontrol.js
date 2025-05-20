@@ -13,3 +13,7 @@ export const showProfile = (userData) => {
 export const showOrganizations = (userData) => {
   return api.get('/User/ShowOrganizations', userData)
 }
+
+export const showMessages = (receiver, jwt) => {
+  return api.get(`/Message/GetMessages?receiver=${receiver}`, jwt)
+}

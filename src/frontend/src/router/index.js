@@ -3,6 +3,7 @@ import Login from '../views/Login.vue'
 import Register from '../views/Register.vue'
 import Workspace from '../views/Workspace.vue'
 import Organization from '../views/Organization.vue'
+import User from '../views/User.vue'
 
 const routes = [
   {
@@ -26,6 +27,12 @@ const routes = [
     meta: { requiresAuth: true },
   },
   {
+    path: '/user/:email',
+    component: User,
+    props: true,
+    meta: { requiresAuth: true },
+  },
+  {
     path: '/',
     redirect: '/login',
   },
@@ -36,7 +43,6 @@ const router = createRouter({
   routes,
 })
 
-// Проверка авторизации перед редиректом на защищенные страницы
 router.beforeEach((to, from, next) => {
   if (to.meta.requiresAuth && !localStorage.getItem('token')) {
     next('/login')

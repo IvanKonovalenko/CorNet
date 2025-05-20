@@ -92,7 +92,7 @@ namespace BL
             {
                 CommentId = c.CommentId,
                 PostId = c.PostId,
-                Email = email,
+                Email = c.User.Email,
                 Code = code,
                 dateTime = c.dateTime,
                 Text = c.Text

@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using DAL.Entities;
-
-namespace BL.Models.Auth
+﻿namespace BL.Models.Auth
 {
     public class RegisterModel
     {

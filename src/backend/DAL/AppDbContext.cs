@@ -34,6 +34,18 @@ namespace DAL
                 .WithMany(p => p.Comments)
                 .HasForeignKey(c => c.PostId);
 
+            modelBuilder.Entity<Message>()
+                .HasOne(m => m.Sender)
+                .WithMany()
+                .HasForeignKey(m => m.SenderId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Message>()
+                .HasOne(m => m.Receiver)
+                .WithMany()
+                .HasForeignKey(m => m.ReceiverId)
+                .OnDelete(DeleteBehavior.Restrict);
+
         }
         public DbSet<User> Users { get; set; }
         public DbSet<Organization> Organizations { get; set; }
@@ -41,5 +53,6 @@ namespace DAL
         public DbSet<Post>  Posts { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<OrganizationRequest> OrganizationRequests { get; set; }
+        public DbSet<Message> Messages { get; set; }
     }
 }

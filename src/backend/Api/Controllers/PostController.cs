@@ -2,7 +2,6 @@
 using BL.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using BL.Models.Post;
 
 namespace Api.Controllers
 {

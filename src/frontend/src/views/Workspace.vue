@@ -1,26 +1,27 @@
 <template>
   <div class="workspace">
-    <h2>Профиль</h2>
-    <div class="profile">
+    <h2 class="section-title">Профиль</h2>
+    <div class="card">
       <p><strong>Имя:</strong> {{ user.name }}</p>
       <p><strong>Фамилия:</strong> {{ user.surname }}</p>
       <p><strong>Email:</strong> {{ user.email }}</p>
     </div>
 
-    <h2>Мои организации</h2>
-    <ul class="org-list">
-      <li
+    <h2 class="section-title">Мои организации</h2>
+    <div class="card card-list">
+      <div
         v-for="org in organizations"
         :key="org.code"
         @click="goToOrganization(org.code)"
-        class="org-item"
+        class="card-item"
       >
-        {{ org.name }} (код: {{ org.code }})
-      </li>
-    </ul>
+        <div class="card-title">{{ org.name }}</div>
+        <div class="card-subtext">Код: {{ org.code }}</div>
+      </div>
+    </div>
 
-    <div class="actions">
-      <h3>Отправить запрос на вступление</h3>
+    <div class="card">
+      <h3 class="subsection-title">Отправить запрос на вступление</h3>
       <input
         v-model="joinCode"
         type="text"
@@ -33,7 +34,7 @@
         Отправить запрос
       </button>
 
-      <h3>Создать организацию</h3>
+      <h3 class="subsection-title">Создать организацию</h3>
       <input
         v-model="newOrgName"
         type="text"
@@ -55,7 +56,7 @@
       <p v-if="loading" class="loading">Загрузка...</p>
     </div>
 
-    <button class="logout" @click="logout">Выйти</button>
+    <button class="logout-button" @click="logout">Выйти</button>
   </div>
 </template>
 
@@ -64,7 +65,6 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { showProfile, showOrganizations } from '../services/usercontrol'
 import { create, sendRequest } from '../services/organizationcontrol'
-
 
 const router = useRouter()
 const user = ref({})
@@ -112,7 +112,7 @@ const sendJoinRequest = async () => {
 
   loading.value = true
   try {
-    await sendRequest({ headers: { Authorization: `Bearer ${token}` } },joinCode.value)
+    await sendRequest({ headers: { Authorization: `Bearer ${token}` } }, joinCode.value)
     alert('Запрос отправлен')
     joinCode.value = ''
   } catch (err) {
@@ -131,7 +131,10 @@ const createOrganization = async () => {
 
   loading.value = true
   try {
-    await create({ name: newOrgName.value, code: newOrgCode.value },{ headers: { Authorization: `Bearer ${token}` } })
+    await create(
+      { name: newOrgName.value, code: newOrgCode.value },
+      { headers: { Authorization: `Bearer ${token}` } }
+    )
     alert('Организация создана')
     newOrgName.value = ''
     newOrgCode.value = ''
@@ -157,88 +160,121 @@ onMounted(fetchData)
 
 <style scoped>
 .workspace {
-  max-width: 700px;
+  max-width: 900px;
   margin: 60px auto;
-  padding: 30px;
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+  padding: 32px;
   font-family: 'Segoe UI', sans-serif;
+  color: #2c3e50;
 }
 
-.profile, .actions {
-  margin-bottom: 30px;
-}
-
-h2, h3 {
+.section-title {
+  font-size: 28px;
+  font-weight: 700;
   color: #3f51b5;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
 }
 
-.org-list {
-  list-style: none;
-  padding: 0;
+.subsection-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #3f51b5;
+  margin: 24px 0 12px;
 }
 
-.org-item {
-  padding: 10px;
-  margin-bottom: 8px;
-  border: 1px solid #ddd;
-  border-radius: 10px;
+.card {
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+  padding: 24px;
+  margin-bottom: 28px;
+}
+
+.card-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.card-item {
+  background-color: #f4f6ff;
+  border: 1px solid #d4dbff;
+  border-radius: 14px;
+  padding: 18px;
+  transition: all 0.2s ease;
   cursor: pointer;
-  transition: background 0.2s;
+}
+.card-item:hover {
+  background-color: #e3e7ff;
+  box-shadow: 0 4px 12px rgba(63, 81, 181, 0.15);
 }
 
-.org-item:hover {
-  background-color: #f0f0f0;
+.card-title {
+  font-size: 17px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.card-subtext {
+  font-size: 14px;
+  color: #666e91;
 }
 
 input {
   width: 100%;
-  padding: 10px;
-  margin: 8px 0;
-  border-radius: 8px;
+  padding: 12px;
+  margin-top: 10px;
+  margin-bottom: 12px;
+  border-radius: 10px;
   border: 1px solid #ccc;
+  font-size: 15px;
+  transition: border-color 0.3s ease;
+}
+input:focus {
+  outline: none;
+  border-color: #3f51b5;
 }
 
 button {
   width: 100%;
-  padding: 10px;
-  margin-top: 8px;
-  background: #3f51b5;
-  color: white;
+  padding: 12px;
+  background-color: #3f51b5;
+  color: #fff;
   border: none;
-  font-weight: bold;
+  font-weight: 600;
   border-radius: 10px;
-  font-size: 16px;
+  font-size: 15px;
   cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-bottom: 8px;
 }
 
 button:disabled {
-  background: #aaa;
+  background-color: #b0b0b0;
   cursor: not-allowed;
 }
 
 button:hover:enabled {
-  background: #2c3db4;
+  background-color: #2c3db4;
 }
 
-.logout {
-  background: #e53935;
+.logout-button {
+  background-color: #e53935;
+  margin-top: 40px;
 }
 
-.logout:hover {
-  background: #c62828;
+.logout-button:hover {
+  background-color: #c62828;
 }
 
 .error {
-  color: red;
-  margin-top: 10px;
+  color: #e53935;
+  margin-top: 12px;
+  font-weight: 500;
 }
 
 .loading {
   color: #3f51b5;
-  margin-top: 10px;
+  margin-top: 12px;
   font-style: italic;
 }
 </style>

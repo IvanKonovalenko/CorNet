@@ -31,7 +31,7 @@ const password = ref('')
 const error = ref('')
 const emailError = ref('')
 const passwordError = ref('')
-const loading = ref(false)  
+const loading = ref(false)
 
 const validateEmail = (email) => {
   const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/
@@ -56,7 +56,7 @@ const handleLogin = async () => {
     return
   }
 
-  loading.value = true  
+  loading.value = true
 
   try {
     const userData = {
@@ -75,11 +75,100 @@ const handleLogin = async () => {
   } catch (err) {
     error.value = err.response?.data?.error || 'Ошибка входа'
   } finally {
-    loading.value = false  // Скрываем спиннер
+    loading.value = false
   }
 }
 
 const goToRegister = () => router.push('/register')
 </script>
 
-<style scoped src="../styles/auth.css"></style>
+<style scoped>
+.auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: #f4f6fc;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.auth-card {
+  background: #fff;
+  padding: 32px;
+  border-radius: 16px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+}
+
+.auth-card h2 {
+  font-size: 26px;
+  font-weight: 600;
+  color: #3f51b5;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  font-size: 16px;
+  transition: border-color 0.2s;
+}
+
+input:focus {
+  border-color: #3f51b5;
+  outline: none;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 12px;
+  background: #3f51b5;
+  color: white;
+  border: none;
+  font-weight: 600;
+  border-radius: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+button:disabled {
+  background: #bbb;
+  cursor: not-allowed;
+}
+
+button:hover:enabled {
+  background: #2c3db4;
+}
+
+.switch {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.switch a {
+  color: #3f51b5;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.error {
+  color: #e53935;
+  font-size: 14px;
+  margin: 6px 0 0 0;
+}
+
+.loading {
+  color: #3f51b5;
+  font-style: italic;
+  font-size: 14px;
+  margin-top: 8px;
+}
+</style>

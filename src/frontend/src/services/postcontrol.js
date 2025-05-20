@@ -11,7 +11,7 @@ export const createPost = (text, code, jwt) => {
 }
 
 export const deletePost = (code, postId, jwt) => {
-  return api.delete(`/Post/Delete?code=${code}&postId=${postId}`, null, jwt)
+  return api.delete(`/Post/Delete?code=${code}&postId=${postId}`, jwt)
 }
 
 export const like = (code, postId, jwt) => {
@@ -23,11 +23,11 @@ export const disLike = (code, postId, jwt) => {
 }
 
 export const showPosts = (code, jwt) => {
-  return api.get(`/Post/ShowPosts?code=${code}`, null, jwt)
+  return api.get(`/Post/ShowPosts?code=${code}`, jwt)
 }
 
 export const showComments = (code, postId, jwt) => {
-  return api.get(`/Post/ShowComments?code=${code}&postId=${postId}`, null, jwt)
+  return api.get(`/Post/ShowComments?code=${code}&postId=${postId}`, jwt)
 }
 
 export const createComment = (code, postId, text, jwt) => {
@@ -35,5 +35,5 @@ export const createComment = (code, postId, text, jwt) => {
 }
 
 export const deleteComment = (code, postId, commentId, jwt) => {
-  return api.delete(`/Post/DeleteComment?code=${code}&postId=${postId}&commentId=${commentId}`, null, jwt)
+  return api.delete(`/Post/DeleteComment?code=${code}&postId=${postId}&commentId=${commentId}`, jwt)
 }

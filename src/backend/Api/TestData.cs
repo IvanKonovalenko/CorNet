@@ -1,7 +1,6 @@
 ﻿using BL;
 using DAL;
 using DAL.Entities;
-using Microsoft.EntityFrameworkCore;
 
 namespace Api
 {

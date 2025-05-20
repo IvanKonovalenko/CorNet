@@ -12,21 +12,24 @@ builder.Services.AddScoped<IEncrypt, Encrypt>();
 builder.Services.AddScoped<IOrganizationControl, OrganizationControl>();
 builder.Services.AddScoped<IPostControl, PostControl>();
 builder.Services.AddScoped<IUserControl, UserControl>();
-
-builder.Services.AddAuth();
+builder.Services.AddScoped<IMessageControl, MessageControl>();
+builder.Services.AddSignalR();
+builder.Services.AddAuth(builder.Configuration);
 builder.Services.AddControllers();
 
 var connectionString = builder.Configuration.GetSection("connectionString").Value;
 builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString));
 
+var port = builder.Configuration.GetSection("connectionString").Value;
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", policy =>
+    options.AddPolicy("AllowFrontend", policy =>
     {
         policy
-            .AllowAnyOrigin()
+            .WithOrigins($"http://localhost:{port}")
+            .AllowAnyHeader()
             .AllowAnyMethod()
-            .AllowAnyHeader();
+            .AllowCredentials();
     });
 });
 
@@ -40,11 +43,12 @@ using (var scope = app.Services.CreateScope())
     await TestData.CreateTestData(dbContext);
 }
 
-app.UseCors("AllowAll");
+app.UseCors("AllowFrontend");
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<ChatHub>("/chathub").RequireCors("AllowFrontend");
 
 app.Run();

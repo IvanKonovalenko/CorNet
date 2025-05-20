@@ -138,7 +138,7 @@ namespace Tests
         {
             List<UserModel> users = await _organizationControl.ShowUsers("Org1", "test1@example.com");
 
-            Assert.True(users?.Any(u => u.Email == "test@example.com" && u.Name == "Test" && u.Surname == "User"));
+            Assert.True(users?.Any(u => u.Email == "test@example.com" && u.Name == "Test" && u.Surname == "User" && u.Role=="Owner"));
 
             await Assert.ThrowsAsync<OrganizationNotExistsException>(() => _organizationControl.ShowUsers("AnotherOrg", "test1@example.com"));
 

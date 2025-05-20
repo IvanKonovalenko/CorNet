@@ -88,10 +88,12 @@ namespace BL
 
             await ValidateRole(user, organization);
 
-            OrganizationRequest? organizationRequest = await _context.OrganizationRequests.Where(or => or.OrganizationRequestId == OrganizationRequestId).FirstOrDefaultAsync();
+            OrganizationRequest? organizationRequest = await _context.OrganizationRequests.Where(or => or.OrganizationRequestId == OrganizationRequestId).Include(or => or.User).FirstOrDefaultAsync();
             if (organizationRequest is null) throw new OrganizationRequestNotExistsException();
 
-            UserOrganization userOrganization = new UserOrganization() { User = organizationRequest.User, Organization = organization, Role = Role.Member };
+            User? userRequest = await _context.Users.Where(user => user.Email == organizationRequest.User.Email).FirstOrDefaultAsync();
+
+            UserOrganization userOrganization = new UserOrganization() { User = userRequest!, Organization = organization, Role = Role.Member };
 
             _context.OrganizationRequests.Remove(organizationRequest);
             await _context.UserOrganizations.AddAsync(userOrganization);
@@ -128,7 +130,8 @@ namespace BL
             return await _context.UserOrganizations.Where(uo => uo.Organization.Code == code).Select(uo => new UserModel() {
                 Email = uo.User.Email,
                 Name = uo.User.Name,
-                Surname = uo.User.Surname
+                Surname = uo.User.Surname,
+                Role = uo.Role.ToString()
             }).ToListAsync();
         }
         public async Task DeleteUser(string code, string email, string emailDeleteUser)
