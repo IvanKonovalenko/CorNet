@@ -100,7 +100,7 @@ namespace BL.Services
         }
         protected async Task<Post> CheckPostNotExsits(int postId)
         {
-            Post? post = await _context.Posts.FirstOrDefaultAsync(p => p.PostId == postId);
+            Post? post = await _context.Posts.Include(p => p.Likes).FirstOrDefaultAsync(p => p.PostId == postId);
             if (post is null) throw new PostNotExistException();
             return post;
         }
